@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cart</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    #cartItems {
+        margin-top: 20px;
+    }
+    .cart-item {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px 0;
+        text-align: center;
+    }
+    .cart-item p {
+        font-size: 1.2em;
+        margin: 5px 0;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -20,13 +35,40 @@
   </header>
 
   <main>
-    <h2>Cart</h2>
+    <h2>Carrito</h2>
     <div id="cartItems">
       
     </div>
-    <button onclick="purchaseCart()">Purchase</button>
+    <button onclick="purchaseCart()">Comprar</button>
   </main>
 
-  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartItemsDiv = document.getElementById('cartItems');
+        
+        if (cart.length === 0) {
+            cartItemsDiv.innerHTML = '<p>Tu carrito está vacío.</p>';
+        } else {
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('cart-item');
+                itemDiv.innerHTML = `<p>${item.nombre}</p><p>Precio: $${item.precio}</p>`;
+                cartItemsDiv.appendChild(itemDiv);
+            });
+        }
+    });
+
+    function purchaseCart() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+            alert('Tu carrito está vacío.');
+            return;
+        }
+        localStorage.removeItem('cart');
+        alert('Compra realizada con éxito');
+        location.reload();
+    }
+  </script>
 </body>
 </html>

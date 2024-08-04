@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>E-commerce</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Agrega estilos adicionales aquí */
+    .product {
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin: 20px;
+        text-align: center;
+    }
+    .product h2 {
+        font-size: 1.5em;
+    }
+    .product p {
+        font-size: 1.2em;
+        margin: 10px 0;
+    }
+    .product button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    .product button:hover {
+        background-color: #45a049;
+    }
+    #sortOptions {
+        margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -20,12 +49,61 @@
   </header>
 
   <main>
-    <h2>Products</h2>
+    <h2>Productos</h2>
+    <div id="sortOptions">
+      <label for="sort">Filtrar por precio</label>
+      <select id="sort" onchange="sortProducts()">
+        <option value="asc">Precio: Menor a mayor</option>
+        <option value="desc">Precio: Mayor a menor</option>
+      </select>
+    </div>
     <div id="products">
       
     </div>
   </main>
 
-  <script src="js/main.js"></script>
+  <script>
+    const products = [
+      { nombre: 'Súper Choripán', precio: 2000 },
+      { nombre: 'Milanesa Loca', precio: 2500 },
+      { nombre: 'Pasta Divertida', precio: 1000 }
+    ];
+
+    function renderProducts(products) {
+      const productsDiv = document.getElementById('products');
+      productsDiv.innerHTML = ''; 
+      products.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.classList.add('product');
+        productDiv.innerHTML = `
+          <h2>${product.nombre}</h2>
+          <p>Precio: $${product.precio}</p>
+          <button onclick="comprarProducto('${product.nombre}', ${product.precio})">Agregar al carrito</button>
+        `;
+        productsDiv.appendChild(productDiv);
+      });
+    }
+
+    function sortProducts() {
+      const sortOption = document.getElementById('sort').value;
+      const sortedProducts = [...products].sort((a, b) => {
+        if (sortOption === 'asc') {
+          return a.precio - b.precio;
+        } else {
+          return b.precio - a.precio;
+        }
+      });
+      renderProducts(sortedProducts);
+    }
+
+    function comprarProducto(nombre, precio) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.push({ nombre, precio });
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(`Has agregado ${nombre} por $${precio} al carrito`);
+    }
+
+    renderProducts(products);
+  </script>
 </body>
 </html>
