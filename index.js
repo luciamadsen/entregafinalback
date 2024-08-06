@@ -16,12 +16,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+
+const mongoStore = MongoStore.create({
+  mongoUrl: process.env.MONGO_URI,
+  collectionName: 'sessions'
+});
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
+  store: mongoStore
 }));
+
+console.log('Mongo URI:', process.env.MONGO_URI);
+console.log('Session Secret:', process.env.SESSION_SECRET);
 
 
 const swaggerOptions = {
@@ -44,7 +54,6 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-
 const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
 const userRoutes = require('./routes/users');
@@ -52,7 +61,6 @@ const userRoutes = require('./routes/users');
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/users', userRoutes);
-
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
