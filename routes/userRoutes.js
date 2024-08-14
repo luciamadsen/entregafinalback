@@ -3,7 +3,6 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const multer = require('multer');
 
-// Configuración de Multer (simplificada)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -18,6 +17,5 @@ router.get('/', userController.getUsers);
 router.delete('/', userController.deleteInactiveUsers);
 router.post('/:uid/documents', upload.array('documents'), (req, res) => {
 });
-
 
 module.exports = router;
