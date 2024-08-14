@@ -8,15 +8,20 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 require('dotenv').config();
 
+const connectDB = require('./config/database');
+const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+const cartRoutes = require('./routes/cartRoutes');
+const adminView = require('./views/adminView');
+const logger = require('./utils/logger');
+
 const app = express();
 const port = process.env.PORT || 3000;
-
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 
 const mongoStore = MongoStore.create({
   mongoUrl: process.env.MONGO_URI,
@@ -29,10 +34,6 @@ app.use(session({
   saveUninitialized: false,
   store: mongoStore
 }));
-
-console.log('Mongo URI:', process.env.MONGO_URI);
-console.log('Session Secret:', process.env.SESSION_SECRET);
-
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -54,19 +55,16 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const productRoutes = require('./routes/products');
-const cartRoutes = require('./routes/cart');
-const userRoutes = require('./routes/users');
-
+app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api/users', userRoutes);
+app.use('/admin', adminView);
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+connectDB()
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
+      logger.info(`Server running on port ${port}`);
     });
   })
   .catch(err => {
